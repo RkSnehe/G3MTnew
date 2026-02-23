@@ -1,0 +1,7 @@
+build/
+CMakeFiles/
+CMakwCache.txt
+MakeFile
+*.o
+*.out
+*.root
