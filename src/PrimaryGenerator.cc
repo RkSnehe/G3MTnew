@@ -23,7 +23,7 @@ PrimaryGenerator::PrimaryGenerator()
 
     // Particle type
     G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
-    G4ParticleDefinition *particle = particleTable->FindParticle("gamma");
+    G4ParticleDefinition *particle = particleTable->FindParticle("mu-");
 
     fParticleGun->SetParticlePosition(pos);
     fParticleGun->SetParticleMomentumDirection(mom);

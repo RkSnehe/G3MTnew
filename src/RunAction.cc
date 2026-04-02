@@ -15,6 +15,10 @@ RunAction::RunAction()
     analysisManager->CreateNtupleDColumn("fWlen"); //wavelength
     analysisManager->CreateNtupleIColumn("layer");
     analysisManager->CreateNtupleIColumn("counter");
+    analysisManager->CreateNtupleDColumn("Edep");
+    analysisManager->CreateNtupleIColumn("PDG"); 
+    analysisManager->CreateNtupleSColumn("ParticleName");
+    
     analysisManager->FinishNtuple(0);
 
 }
@@ -32,7 +36,7 @@ void RunAction::BeginOfRunAction(const G4Run *run)
     std::stringstream strRunID;
     strRunID << runID;
 
-    analysisManager->OpenFile("Gamma_1.5GeV" + strRunID.str() + ".root");
+    analysisManager->OpenFile("Mu_1.5GeV" + strRunID.str() + ".root");
 }
 
 void RunAction::EndOfRunAction(const G4Run *run)
