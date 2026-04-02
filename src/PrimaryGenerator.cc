@@ -5,14 +5,14 @@ PrimaryGenerator::PrimaryGenerator()
     fParticleGun = new G4ParticleGun(1);
 
     // Particle position
-    G4double x = -3. * m;
+    G4double x = 0. * m;
     G4double y = 6. * m;
     G4double z = 0. * m;
     
     G4ThreeVector pos(x, y, z);
 
     // Particle direction
-    G4double theta = 45.*degree;
+    G4double theta = 0.*degree;
     G4double phi = 0.*degree;
 
     G4double px = std::sin(theta)*std::cos(phi);
@@ -27,7 +27,7 @@ PrimaryGenerator::PrimaryGenerator()
 
     fParticleGun->SetParticlePosition(pos);
     fParticleGun->SetParticleMomentumDirection(mom);
-    fParticleGun->SetParticleEnergy(5* GeV);
+    fParticleGun->SetParticleEnergy(1.5 * GeV);
     fParticleGun->SetParticleDefinition(particle);
 }
 

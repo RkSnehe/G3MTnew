@@ -1,5 +1,9 @@
 #include "SensitiveDetector.hh"
-
+#include "G4MuonPlus.hh"
+#include "G4MuonMinus.hh"
+#include "G4Step.hh"
+#include "G4RunManager.hh"
+#include "G4AnalysisManager.hh"
 
 SensitiveDetector::SensitiveDetector(G4String name) : G4VSensitiveDetector(name)
 
@@ -18,44 +22,71 @@ void SensitiveDetector::Initialize(G4HCofThisEvent *)
 }
 
 void SensitiveDetector::EndOfEvent(G4HCofThisEvent *)
-{  
+{
     G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-     
+
     analysisManager->FillH1(0, fTotalEnergyDeposited);
 
-    G4cout << "Deposited energy: " << fTotalEnergyDeposited << G4endl;
+    G4cout << "Total Energy Deposited by Muons: " 
+           << fTotalEnergyDeposited << G4endl;
 }
 
 G4bool SensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *)
 {
-    G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+    G4Track *track = aStep->GetTrack();
+
+    // Particle definition
+    const G4ParticleDefinition *particle = track->GetParticleDefinition();
+
+    // Select only muons
+    if (particle != G4MuonPlus::MuonPlusDefinition() &&
+        particle != G4MuonMinus::MuonMinusDefinition())
+    {
+        return false;
+    }
+
+    G4int eventID = G4RunManager::GetRunManager()
+                    ->GetCurrentEvent()->GetEventID();
 
     G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
     G4StepPoint *preStepPoint = aStep->GetPreStepPoint();
 
-    G4double fGlobalTime = preStepPoint->GetGlobalTime();
-    G4ThreeVector posPhoton = preStepPoint->GetPosition();
-    G4ThreeVector momPhoton = preStepPoint->GetMomentum();
+    G4double globalTime = preStepPoint->GetGlobalTime();
 
-    G4double fMomPhotonMag = momPhoton.mag();
+    G4ThreeVector posMuon = preStepPoint->GetPosition();
+    G4ThreeVector momMuon = preStepPoint->GetMomentum();
 
-    G4double fWlen = (1.239341939 * eV / fMomPhotonMag) * 1E+03;
+    const G4VTouchable* touchable = preStepPoint->GetTouchable();
+    G4int tubeCopyNumber = touchable->GetCopyNumber(1);
 
-    analysisManager->FillNtupleIColumn(0, 0, eventID);
-    analysisManager->FillNtupleDColumn(0,1,posPhoton[0]);
-    analysisManager->FillNtupleDColumn(0,2,posPhoton[1]);
-    analysisManager->FillNtupleDColumn(0,3,posPhoton[2]);
-    analysisManager->FillNtupleDColumn(0,4,fGlobalTime);
-    analysisManager->FillNtupleDColumn(0,5,fWlen);
+    G4int layerNumber = tubeCopyNumber / 1000;
+    G4int counterNumber = tubeCopyNumber % 1000;
+
+    G4cout << "Muon hit -> Layer: " << layerNumber
+       << " Counter: " << counterNumber
+       << G4endl;
+    
+    if(aStep->GetPreStepPoint()->GetStepStatus()!=fGeomBoundary)
+    return false;
+
+    G4double kineticEnergy = track->GetKineticEnergy();
+
+    analysisManager->FillNtupleIColumn(0,0,eventID);
+    analysisManager->FillNtupleDColumn(0,1,posMuon[0]);
+    analysisManager->FillNtupleDColumn(0,2,posMuon[1]);
+    analysisManager->FillNtupleDColumn(0,3,posMuon[2]);
+    analysisManager->FillNtupleDColumn(0,4,globalTime);
+    analysisManager->FillNtupleDColumn(0,5,kineticEnergy);
+    analysisManager->FillNtupleIColumn(0,6,layerNumber);
+    analysisManager->FillNtupleIColumn(0,7,counterNumber);
     analysisManager->AddNtupleRow(0);
 
+    G4double energyDeposited = aStep->GetTotalEnergyDeposit();
 
-    G4double fEnergyDeposited = aStep->GetTotalEnergyDeposit();
-
-    if(fEnergyDeposited >0)
+    if(energyDeposited > 0)
     {
-        fTotalEnergyDeposited +=fEnergyDeposited;
+        fTotalEnergyDeposited += energyDeposited;
     }
 
     return true;

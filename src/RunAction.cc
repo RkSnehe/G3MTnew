@@ -13,6 +13,8 @@ RunAction::RunAction()
     analysisManager->CreateNtupleDColumn("fyz");
     analysisManager->CreateNtupleDColumn("fGlobalTime"); //Time
     analysisManager->CreateNtupleDColumn("fWlen"); //wavelength
+    analysisManager->CreateNtupleIColumn("layer");
+    analysisManager->CreateNtupleIColumn("counter");
     analysisManager->FinishNtuple(0);
 
 }
@@ -30,7 +32,7 @@ void RunAction::BeginOfRunAction(const G4Run *run)
     std::stringstream strRunID;
     strRunID << runID;
 
-    analysisManager->OpenFile("Mu_1GeV" + strRunID.str() + ".root");
+    analysisManager->OpenFile("Gamma_1.5GeV" + strRunID.str() + ".root");
 }
 
 void RunAction::EndOfRunAction(const G4Run *run)

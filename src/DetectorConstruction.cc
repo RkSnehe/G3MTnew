@@ -153,7 +153,7 @@ new G4PVPlacement(rotY90,G4ThreeVector(xPos, yLayer3,
 0),logicTube,"PRC_Tube",logicWorld,false,3000 + i,checkOverlaps);
 }
 
-//concrete of 2m inverted pyramid.
+//concrete of 1m inverted pyramid.
 G4double nInvertedConcrete = 7;
 G4double heightY = 15*cm;
 G4double yPyramidBase = yLayer3 + height/2;
