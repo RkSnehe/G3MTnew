@@ -38,8 +38,21 @@ auto CaO = nist->FindOrBuildMaterial("G4_CALCIUM_OXIDE");
 auto Al2O3 = nist->FindOrBuildMaterial("G4_ALUMINUM_OXIDE");
 auto Fe2O3 = nist->FindOrBuildMaterial("G4_FERRIC_OXIDE");
 auto H2O = nist->FindOrBuildMaterial("G4_WATER");
+
+// P10 gas
 auto P10 = new G4Material("P10", 1.74*mg/cm3, 2);
 
+// soil
+auto Si = nist->FindOrBuildMaterial("G4_Si");
+auto O  = nist->FindOrBuildMaterial("G4_O");
+auto Al = nist->FindOrBuildMaterial("G4_Al");
+auto Fe = nist->FindOrBuildMaterial("G4_Fe");
+
+auto soil = new G4Material("Soil", 1.6*g/cm3, 4);
+soil->AddMaterial(Si, 28*perCent);
+soil->AddMaterial(O,  50*perCent);
+soil->AddMaterial(Al, 10*perCent);
+soil->AddMaterial(Fe, 12*perCent);
 
 P10->AddMaterial(Ar, 90*perCent);
 P10->AddMaterial(CH4,10*perCent);
@@ -154,7 +167,7 @@ new G4PVPlacement(rotY90,G4ThreeVector(xPos, yLayer3,
 }
 
 //concrete of 1m inverted pyramid.
-G4double nInvertedConcrete = 7;
+G4double nInvertedConcrete = 4;
 G4double heightY = 15*cm;
 G4double yPyramidBase = yLayer3 + height/2;
 
@@ -176,6 +189,19 @@ G4double yPos =yPyramidBase +i * heightY +heighty/2;
 new G4PVPlacement( nullptr,G4ThreeVector(0, yPos,  0),logicPyramid,"PyramidConcrete",logicWorld,false,5000 + i,checkOverlaps);
 logicPyramid->SetVisAttributes(new G4VisAttributes(G4Colour(0.6, 0.6, 0.6)));
 }
+
+//soil
+G4double soilThickness = 40*cm;
+G4double soilX = blockX + 2*(nInvertedConcrete-1)*delta;
+G4double soilZ = blockZ + 2*(nInvertedConcrete-1)*delta;
+G4double yTopPyramid = yPyramidBase + nInvertedConcrete * heightY;
+
+auto solidSoil = new G4Box("SoilLayer", soilX/2, soilThickness/2, soilZ/2);
+auto logicSoil = new G4LogicalVolume(solidSoil, soil, "SoilLayer");
+
+G4double ySoil = yTopPyramid + soilThickness/2;
+
+new G4PVPlacement(nullptr,G4ThreeVector(0, ySoil, 0),logicSoil,"SoilLayer",logicWorld,false,6000,checkOverlaps);
 
 logicTube->SetVisAttributes(new G4VisAttributes(G4Colour(0.55,0.27,0.07)));
 logicGas->SetVisAttributes(new G4VisAttributes(G4Colour(0.7,0.7,0.7,0.4)));
